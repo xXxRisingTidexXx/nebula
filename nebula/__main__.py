@@ -1,13 +1,25 @@
 from nebula.clustering import kmeans
-from nebula.db.queries import select_flats
+from nebula.db.queries import (
+    select_primary_housing_flats,
+    select_secondary_housing_flats
+)
 from nebula.extenders import extend_flats
-from plotly.express import scatter_3d
+from nebula.plotting import show_figure
 
 LOCALITY = 'Київ'
 
+PRIMARY_HOUSING_FLATS_CLUSTER_NUMBER = 350
+
+SECONDARY_HOUSING_FLATS_CLUSTER_NUMBER = 600
 
 if __name__ == '__main__':
-    flats = kmeans(extend_flats(select_flats(LOCALITY)))
-    plot = scatter_3d(flats, 'longitude', 'latitude', 'rate', 'cluster_id')
-    plot.update_traces(marker={'size': 3})
-    plot.show()
+    show_figure(
+        kmeans(
+            extend_flats(select_primary_housing_flats(LOCALITY)),
+            PRIMARY_HOUSING_FLATS_CLUSTER_NUMBER
+        ),
+        kmeans(
+            extend_flats(select_secondary_housing_flats(LOCALITY)),
+            SECONDARY_HOUSING_FLATS_CLUSTER_NUMBER
+        )
+    )

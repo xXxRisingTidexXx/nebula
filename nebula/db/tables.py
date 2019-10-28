@@ -54,7 +54,9 @@ Details = Table(
     'details',
     metadata,
     Column('id', Integer, primary_key=True),
-    Column('value', String(60), unique=True, nullable=False)
+    Column('feature', String(30), nullable=False),
+    Column('value', String(60), unique=True, nullable=False),
+    Column('group', String(20), nullable=False)
 )
 
 FlatsDetails = Table(

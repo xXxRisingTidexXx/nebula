@@ -1,10 +1,11 @@
 from pandas import read_sql, DataFrame
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, and_
+from sqlalchemy.sql import ClauseElement, Selectable
 from nebula.config import DSN
-from nebula.db.tables import Geolocations, Flats
+from nebula.db.tables import Geolocations, Flats, FlatsDetails, Details
 
 
-def select_flats(locality: str) -> DataFrame:
+def _select_flats(clause: ClauseElement) -> DataFrame:
     with create_engine(DSN).connect() as connection:
         return read_sql(
             select([
@@ -13,7 +14,31 @@ def select_flats(locality: str) -> DataFrame:
                 Geolocations.c.point.ST_AsGeoJSON().label('point')
             ])
             .select_from(Flats.join(Geolocations))
-            .where(Geolocations.c.locality == locality),
+            .where(clause),
             connection,
             index_col=['id']
         )
+
+
+def _query_primary_housing_flats() -> Selectable:
+    return (
+        select([FlatsDetails.c.flat_id])
+        .select_from(FlatsDetails.join(Details))
+        .where(Details.c.value.in_(
+            ['Первинне житло', 'На етапі будівництва']
+        ))
+    )
+
+
+def select_primary_housing_flats(locality: str) -> DataFrame:
+    return _select_flats(and_(
+        Geolocations.c.locality == locality,
+        Flats.c.id.in_(_query_primary_housing_flats())
+    ))
+
+
+def select_secondary_housing_flats(locality: str) -> DataFrame:
+    return _select_flats(and_(
+        Geolocations.c.locality == locality,
+        Flats.c.id.notin_(_query_primary_housing_flats())
+    ))

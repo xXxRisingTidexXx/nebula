@@ -1,15 +1,10 @@
 from pandas import DataFrame
 from sklearn.cluster import KMeans
 
-CLUSTER_NUMBER = 220
 
-TOLERANCE = 1e-7
-
-
-def kmeans(frame: DataFrame) -> DataFrame:
+def kmeans(frame: DataFrame, cluster_number: int) -> DataFrame:
     clusterized = frame.copy()
     clusterized['cluster_id'] = (
-        KMeans(CLUSTER_NUMBER, tol=TOLERANCE)
-        .fit_predict(clusterized.iloc[:, 0:4])
+        KMeans(cluster_number).fit_predict(clusterized.iloc[:, 0:4])
     )
     return clusterized
