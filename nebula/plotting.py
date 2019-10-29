@@ -1,14 +1,15 @@
 from pandas import DataFrame
-from plotly.subplots import make_subplots
-from plotly.graph_objects import Scatter3d
+from plotly.express import scatter_3d
 
 
-def show_figure(
-    primary_housing_flats: DataFrame,
-    secondary_housing_flats: DataFrame
-):
-    figure = make_subplots(cols=2, specs=[[{'type': 'scene'}, {'type': 'scene'}]])
-    figure.add_traces(Scatter3d(), row=1, col=1)
-    figure.add_traces(Scatter3d(), row=1, col=2)
-    figure.update_layout(width=1024, height=800, showlegend=False)
+def show_figure(flats: DataFrame, title: str):
+    figure = scatter_3d(
+        flats,
+        'longitude',
+        'latitude',
+        'rate',
+        'cluster_id',
+        title=title
+    )
+    figure.update_traces(marker={'size': 3, 'opacity': 0.8})
     figure.show()

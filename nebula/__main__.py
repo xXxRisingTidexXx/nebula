@@ -1,3 +1,5 @@
+from time import time
+from typing import Callable
 from nebula.clustering import kmeans
 from nebula.db.queries import (
     select_primary_housing_flats,
@@ -5,21 +7,29 @@ from nebula.db.queries import (
 )
 from nebula.extenders import extend_flats
 from nebula.plotting import show_figure
+from concurrent.futures.process import ProcessPoolExecutor
 
 LOCALITY = 'Київ'
 
-PRIMARY_HOUSING_FLATS_CLUSTER_NUMBER = 350
 
-SECONDARY_HOUSING_FLATS_CLUSTER_NUMBER = 600
+def visualize(select_flats: Callable, cluster_number: int, title: str):
+    flats, cluster_centers = kmeans(
+        extend_flats(select_flats(LOCALITY)),
+        cluster_number
+    )
+    show_figure(flats, title)
+
 
 if __name__ == '__main__':
-    show_figure(
-        kmeans(
-            extend_flats(select_primary_housing_flats(LOCALITY)),
-            PRIMARY_HOUSING_FLATS_CLUSTER_NUMBER
-        ),
-        kmeans(
-            extend_flats(select_secondary_housing_flats(LOCALITY)),
-            SECONDARY_HOUSING_FLATS_CLUSTER_NUMBER
-        )
-    )
+    visualize(select_primary_housing_flats, 350, '')
+    # with ProcessPoolExecutor(max_workers=4) as executor:
+    #     for result in executor.map(
+    #         visualize,
+    #         [select_primary_housing_flats, select_secondary_housing_flats],
+    #         [350, 600],
+    #         [
+    #             f'{LOCALITY}, ринок первинного житла',
+    #             f'{LOCALITY}, ринок вторинного житла'
+    #         ]
+    #     ):
+    #         print('Visualizing...')
