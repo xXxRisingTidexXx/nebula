@@ -1,4 +1,3 @@
-from time import time
 from typing import Callable
 from nebula.clustering import kmeans
 from nebula.db.queries import (
@@ -8,6 +7,7 @@ from nebula.db.queries import (
 from nebula.extenders import extend_flats
 from nebula.plotting import show_figure
 from concurrent.futures.process import ProcessPoolExecutor
+from nebula.spatial import voronoi
 
 LOCALITY = 'Київ'
 
@@ -18,18 +18,18 @@ def visualize(select_flats: Callable, cluster_number: int, title: str):
         cluster_number
     )
     show_figure(flats, title)
+    voronoi(cluster_centers)
 
 
 if __name__ == '__main__':
-    visualize(select_primary_housing_flats, 350, '')
-    # with ProcessPoolExecutor(max_workers=4) as executor:
-    #     for result in executor.map(
-    #         visualize,
-    #         [select_primary_housing_flats, select_secondary_housing_flats],
-    #         [350, 600],
-    #         [
-    #             f'{LOCALITY}, ринок первинного житла',
-    #             f'{LOCALITY}, ринок вторинного житла'
-    #         ]
-    #     ):
-    #         print('Visualizing...')
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        for result in executor.map(
+            visualize,
+            [select_primary_housing_flats, select_secondary_housing_flats],
+            [350, 600],
+            [
+                f'{LOCALITY}, ринок первинного житла',
+                f'{LOCALITY}, ринок вторинного житла'
+            ]
+        ):
+            print('Visualizing...')
