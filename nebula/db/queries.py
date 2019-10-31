@@ -1,4 +1,5 @@
 from pandas import read_sql, DataFrame
+from simplejson import loads
 from sqlalchemy import create_engine, select, and_
 from sqlalchemy.sql import ClauseElement, Selectable
 from nebula.config import DSN
@@ -7,7 +8,7 @@ from nebula.db.tables import Geolocations, Flats, FlatsDetails, Details
 
 def _select_flats(clause: ClauseElement) -> DataFrame:
     with create_engine(DSN).connect() as connection:
-        return read_sql(
+        flats = read_sql(
             select([
                 Flats.c.id,
                 Flats.c.rate,
@@ -18,6 +19,10 @@ def _select_flats(clause: ClauseElement) -> DataFrame:
             connection,
             index_col=['id']
         )
+        flats['point'] = flats['point'].map(lambda p: loads(p)['coordinates'])
+        flats['longitude'] = flats['point'].map(lambda p: p[0])
+        flats['latitude'] = flats['point'].map(lambda p: p[1])
+        return flats.drop(columns=['point'])
 
 
 def _query_primary_housing_flats() -> Selectable:

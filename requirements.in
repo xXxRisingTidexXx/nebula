@@ -8,3 +8,5 @@ sqlalchemy-utils
 trafaret
 pyyaml
 simplejson
+geovoronoi
+requests
