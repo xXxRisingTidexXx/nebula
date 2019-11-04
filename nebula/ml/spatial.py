@@ -1,7 +1,12 @@
-from pandas import DataFrame
-from scipy.spatial import Voronoi
+from typing import Tuple, Union, List
+from geovoronoi import voronoi_regions_from_coords
+from shapely.geometry import Polygon, MultiPolygon
+from numpy import ndarray
 
 
-def voronoi(frame: DataFrame):
-    v = Voronoi(frame.iloc[:, 1:3])
-    print(v.vertices)
+def geovoronoi(
+    sites: ndarray,
+    boundaries: Union[MultiPolygon, Polygon]
+) -> Tuple[List[Union[MultiPolygon, Polygon]], List[List[int]]]:
+    polygons, points, assignments = voronoi_regions_from_coords(sites, boundaries)
+    return polygons, assignments

@@ -1,29 +1,41 @@
-from typing import Callable
-from nebula.ml.clustering import kmeans
-from nebula.db.queries import (
-    select_primary_housing_flats,
-    select_secondary_housing_flats
-)
-from nebula.ml.plotting import show_figure
+from typing import List, Union
+from shapely.geometry import MultiPolygon, Polygon
 from concurrent.futures.process import ProcessPoolExecutor
+from nebula.ml.plotting import show_figure
+from nebula.web.nominatim import get_boundaries
+from nebula.snapshots import make_snapshot, Zone
 
-LOCALITY = 'Київ'
+
+def make_snapshots(
+    locality: str,
+    boundaries: Union[Polygon, MultiPolygon]
+) -> List[List[Zone]]:
+    with ProcessPoolExecutor(max_workers=2) as executor:
+        return [
+            s for s in executor.map(
+                make_snapshot,
+                [locality, locality],
+                ['primary', 'secondary'],
+                [250, 600],
+                [boundaries, boundaries]
+            )
+        ]
 
 
-def visualize(select_flats: Callable, cluster_number: int, title: str):
-    flats, cluster_centers = kmeans(select_flats(LOCALITY), cluster_number)
-    show_figure(flats, title)
+def main():
+    locality = 'Київ'
+    show_figure(
+        make_snapshot(
+            locality,
+            'primary',
+            30,
+            get_boundaries(locality)
+        ),
+        f'{locality}, первинне житло',
+        'Цінові зони',
+        'Групування за розміщенням та вартістю кв. м. житла'
+    )
 
 
 if __name__ == '__main__':
-    with ProcessPoolExecutor(max_workers=4) as executor:
-        for result in executor.map(
-            visualize,
-            [select_primary_housing_flats, select_secondary_housing_flats],
-            [350, 600],
-            [
-                f'{LOCALITY}, ринок первинного житла',
-                f'{LOCALITY}, ринок вторинного житла'
-            ]
-        ):
-            print('Visualizing...')
+    main()
