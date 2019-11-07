@@ -75,16 +75,10 @@ def _show_flats(figure: Figure, flats: DataFrame):
     ))
 
 
-def show_figure(
-    snapshot: Snapshot,
-    figure_title: str,
-    zones_title: str,
-    flats_title: str
-):
+def show_figure(snapshot: Snapshot, figure_title: str):
     figure = make_subplots(
         cols=2,
         column_widths=[0.55, 0.45],
-        column_titles=[zones_title, flats_title],
         specs=[[{'type': 'scattermapbox'}, {'type': 'scatter3d'}]]
     )
     _show_zones(figure, snapshot.zones)
