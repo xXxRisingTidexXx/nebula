@@ -76,7 +76,7 @@ class Snapshot:
         ]
 
     def __str__(self) -> str:
-        return f'(\n{self.flats},\n{self.zones}\n)'
+        return f'(\n{self.flats},\n{self.sites},\n{self.zones}\n)'
 
     def __repr__(self) -> str:
-        return f'(\n{self.flats},\n{self.zones}\n)'
+        return f'(\n{self.flats},\n{self.sites},\n{self.zones}\n)'

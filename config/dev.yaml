@@ -4,3 +4,5 @@ database:
   host: localhost
   port: 5432
   database: raions
+mapbox:
+  token: 'pk.eyJ1IjoieHh4cmlzaW5ndGlkZXh4eCIsImEiOiJjazJydnF4c24wZjdjM21udjhmbWRqaXpvIn0.SUXg88So6ctFf7ykIrnqCQ'

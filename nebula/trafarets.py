@@ -7,5 +7,6 @@ config_trafaret = Dict(
         host=String,
         port=Int,
         database=String
-    )
+    ),
+    mapbox=Dict(token=String)
 )
