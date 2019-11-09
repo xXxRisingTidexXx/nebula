@@ -4,6 +4,7 @@ from nebula.config import CONFIG
 from nebula.snapshots import Snapshot
 from plotly.graph_objects import Figure, Scattermapbox, Scatter3d
 from plotly.subplots import make_subplots
+from nebula.visualization.color_scales import ColorScale
 
 
 def _show_flats(figure: Figure, flats: DataFrame):
@@ -18,7 +19,7 @@ def _show_flats(figure: Figure, flats: DataFrame):
             marker={'size': 4, 'color': flats['zone_id']},
             hovertemplate=(
                 '<b>Координати</b>: (%{x:.3f}, %{y:.3f})<br>'
-                '<b>Середня вартість</b>: %{z:.2f}<br>'
+                '<b>Середня вартість</b>: %{z:.2f} $<br>'
                 '<b>ID кластера</b>: %{text}'
             ),
             text=flats['zone_id']
@@ -27,13 +28,14 @@ def _show_flats(figure: Figure, flats: DataFrame):
             scene={
                 'xaxis_title': 'Довгота',
                 'yaxis_title': 'Широта',
-                'zaxis_title': 'Вартість 1 кв. м. (у $ США)'
+                'zaxis_title': 'Вартість 1 кв. м.'
             }
         )
     )
 
 
 def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
+    color_scale = ColorScale(sites['rate'])
     (
         figure
         .add_trace(Scattermapbox(
@@ -44,7 +46,7 @@ def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
             marker={'size': 8, 'color': 'red'},
             hovertemplate=(
                 '<b>Координати</b>: (%{lon:.3f}, %{lat:.3f})<br>'
-                '<b>Середня вартість</b>: %{text}'
+                '<b>Середня вартість</b>: %{text} $'
             ),
             text=[f'{r:.2f}' for r in sites['rate']]
         ))
@@ -58,11 +60,11 @@ def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
                     {
                         'type': 'fill',
                         'below': 'traces',
-                        'color': 'royalblue',
-                        'opacity': 0.5,
+                        'color': color_scale[r],
+                        'opacity': 0.6,
                         'source': z
                     }
-                    for z in zones
+                    for r, z in zip(sites['rate'], zones)
                 ]
             }
         )

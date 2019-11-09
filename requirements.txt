@@ -6,6 +6,7 @@
 #
 certifi==2019.9.11        # via requests
 chardet==3.0.4            # via requests
+colour==0.1.5
 geoalchemy2==0.6.3
 geovoronoi==0.1.2
 idna==2.8                 # via requests

@@ -3,8 +3,8 @@ from numpy import ndarray, mean
 from pandas import DataFrame
 from shapely.geometry import MultiPolygon, Polygon, mapping
 from nebula.db.queries import select_flats
-from nebula.ml.clustering import kmeans
-from nebula.ml.spatial import geovoronoi
+from nebula.models.clustering import kmeans
+from nebula.models.spatial import geovoronoi
 
 
 def make_snapshot(

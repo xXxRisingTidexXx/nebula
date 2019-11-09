@@ -10,3 +10,4 @@ pyyaml
 simplejson
 geovoronoi
 requests
+colour
