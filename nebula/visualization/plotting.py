@@ -43,7 +43,7 @@ def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
             mode='markers',
             lon=sites['longitude'],
             lat=sites['latitude'],
-            marker={'size': 8, 'color': 'red'},
+            marker={'size': 20, 'color': 'red', 'opacity': 0},
             hovertemplate=(
                 '<b>Координати</b>: (%{lon:.3f}, %{lat:.3f})<br>'
                 '<b>Середня вартість</b>: %{text} $'

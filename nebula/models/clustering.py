@@ -8,5 +8,5 @@ def kmeans(
     frame: DataFrame,
     cluster_number: int
 ) -> Tuple[ndarray, ndarray]:
-    model = KMeans(cluster_number).fit(frame)
+    model = KMeans(cluster_number, max_iter=400).fit(frame)
     return model.labels_, model.cluster_centers_
