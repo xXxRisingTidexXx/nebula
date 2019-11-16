@@ -1,22 +1,25 @@
 from typing import Any, Dict, List
 from pandas import DataFrame
 from nebula.config import CONFIG
-from nebula.snapshots import Snapshot
 from plotly.graph_objects import Figure, Scattermapbox, Scatter3d
-from plotly.subplots import make_subplots
 from nebula.visualization.color_scales import ColorScale
 
 
-def _show_flats(figure: Figure, flats: DataFrame):
+def show_flats(flats: DataFrame, title: str):
     (
-        figure
+        Figure()
         .add_trace(Scatter3d(
             name='',
             x=flats['longitude'],
             y=flats['latitude'],
             z=flats['rate'],
             mode='markers',
-            marker={'size': 4, 'color': flats['zone_id']},
+            marker={
+                'size': 4,
+                'color': flats['zone_id'],
+                'showscale': True,
+                'colorbar': {'title': 'ID кластера'}
+            },
             hovertemplate=(
                 '<b>Координати</b>: (%{x:.3f}, %{y:.3f})<br>'
                 '<b>Середня вартість</b>: %{z:.2f} $<br>'
@@ -25,25 +28,38 @@ def _show_flats(figure: Figure, flats: DataFrame):
             text=flats['zone_id']
         ))
         .update_layout(
+            title=title,
             scene={
                 'xaxis_title': 'Довгота',
                 'yaxis_title': 'Широта',
-                'zaxis_title': 'Вартість 1 кв. м.'
-            }
+                'zaxis_title': 'Вартість 1 кв. м., $'
+            },
+            showlegend=False
         )
+        .show()
     )
 
 
-def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
+def show_zones(sites: DataFrame, zones: List[Dict[str, Any]], title: str):
     color_scale = ColorScale(sites['rate'])
     (
-        figure
+        Figure()
         .add_trace(Scattermapbox(
             name='',
             mode='markers',
             lon=sites['longitude'],
             lat=sites['latitude'],
-            marker={'size': 20, 'color': 'red', 'opacity': 0},
+            marker={
+                'size': 0,
+                'showscale': True,
+                'colorscale': color_scale.colors,
+                'cmin': color_scale.min_tick,
+                'cmax': color_scale.max_tick,
+                'colorbar': {
+                    'tick0': color_scale.min_tick,
+                    'dtick': (color_scale.max_tick - color_scale.min_tick) / 6
+                }
+            },
             hovertemplate=(
                 '<b>Координати</b>: (%{lon:.3f}, %{lat:.3f})<br>'
                 '<b>Середня вартість</b>: %{text} $'
@@ -51,6 +67,8 @@ def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
             text=[f'{r:.2f}' for r in sites['rate']]
         ))
         .update_layout(
+            title=title,
+            showlegend=False,
             mapbox={
                 'accesstoken': CONFIG['mapbox']['token'],
                 'style': 'outdoors',
@@ -61,30 +79,12 @@ def _show_zones(figure: Figure, sites: DataFrame, zones: List[Dict[str, Any]]):
                         'type': 'fill',
                         'below': 'traces',
                         'color': color_scale[r],
-                        'opacity': 0.6,
+                        'opacity': 0.85,
                         'source': z
                     }
                     for r, z in zip(sites['rate'], zones)
                 ]
             }
-        )
-    )
-
-
-def show_figure(snapshot: Snapshot, title: str):
-    figure = make_subplots(
-        cols=2,
-        column_widths=[0.45, 0.55],
-        specs=[[{'type': 'scatter3d'}, {'type': 'scattermapbox'}]]
-    )
-    _show_flats(figure, snapshot.flats)
-    _show_zones(figure, snapshot.sites, snapshot.zones)
-    (
-        figure
-        .update_layout(
-            title=title,
-            showlegend=False,
-            margin={'t': 60, 'r': 10, 'b': 10, 'l': 20}
         )
         .show()
     )

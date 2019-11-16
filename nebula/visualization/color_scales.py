@@ -1,20 +1,23 @@
 from typing import Sequence
 from colour import Color
-from math import isclose
-from nebula.utils import find
 
 
 class ColorScale:
-    min_color = Color('#df9bec')
-    max_color = Color('#40044b')
+    _min_color = Color('#df9bec')
+    _max_color = Color('#40044b')
 
-    def __init__(self, tickles: Sequence[float]):
-        self._tickles = sorted(tickles)
-        self._colors = list(self.min_color.range_to(self.max_color, len(tickles)))
+    def __init__(self, ticks: Sequence[float]):
+        self.size = len(ticks)
+        self.colors = [
+            c.hex for c in
+            self._min_color.range_to(self._max_color, self.size)
+        ]
+        self.min_tick = min(ticks)
+        self.max_tick = max(ticks)
 
-    def __getitem__(self, value: float) -> str:
-        return find(
-            lambda p: value < p[0] or isclose(value, p[0]),
-            zip(self._tickles, self._colors),
-            (0, self.max_color)
-        )[1].hex
+    def __getitem__(self, tick: float) -> str:
+        return self.colors[round(
+            (self.size - 1) *
+            (tick - self.min_tick) /
+            (self.max_tick - self.min_tick)
+        )]
