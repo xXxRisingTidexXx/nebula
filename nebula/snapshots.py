@@ -10,11 +10,11 @@ from nebula.models.spatial import geovoronoi
 def make_snapshot(
     locality: str,
     housing: str,
-    cluster_number: int,
+    k: int,
     boundaries: Union[MultiPolygon, Polygon]
 ) -> 'Snapshot':
     flats = select_flats(locality, housing)
-    labels, centroids = kmeans(flats, cluster_number)
+    labels, centroids = kmeans(flats, k)
     polygons, assignments = geovoronoi(centroids[:, [1, 2]], boundaries)
     return Snapshot(flats, labels, centroids, polygons, assignments)
 
