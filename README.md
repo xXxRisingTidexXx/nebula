@@ -22,6 +22,6 @@ $ conda deactivate
 ```
 or simply add an alias (according to your `conda` path):
 ```bash
-$ alias nebula="$HOME/anaconda3/envs/nebula/bin/python -m"
+$ alias nebula="$HOME/anaconda3/envs/nebula/bin/python -m nebula"
 $ nebula
 ```
